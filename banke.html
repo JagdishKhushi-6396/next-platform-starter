@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BANKE LAL TOUR & TRAVEL — Booking</title>
+  <style>
+    :root{--accent:#0b6cf0;--muted:#666}
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; color:#111}
+    header{background:linear-gradient(90deg,#071c3a,#0b6cf0);color:#fff;padding:28px 18px}
+    .container{max-width:1000px;margin:22px auto;padding:0 18px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .brand h1{margin:0;font-size:20px;letter-spacing:0.4px}
+    .hero{display:flex;gap:24px;align-items:center;margin-top:18px}
+    .hero .left{flex:1}
+    .hero .right{width:360px;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(12,24,48,0.08);padding:18px}
+
+    label{display:block;font-weight:600;margin:10px 0 6px}
+    input,select,textarea{width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px}
+    .row{display:flex;gap:12px}
+    .row .col{flex:1}
+    .btn{display:inline-block;background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+    .muted{color:var(--muted);font-size:13px}
+    footer{padding:18px 0;text-align:center;color:#666;font-size:14px;margin-top:28px}
+
+    /* Confirmation modal */
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,0.5);display:none;align-items:center;justify-content:center}
+    .modal .card{background:#fff;padding:20px;border-radius:12px;max-width:420px;width:100%;box-shadow:0 12px 30px rgba(2,6,23,0.2)}
+
+    /* responsive */
+    @media (max-width:880px){.hero{flex-direction:column}.hero .right{width:100%}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="brand">
+        <div style="width:52px;height:52px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800">BL</div>
+        <div>
+          <h1>BANKE LAL TOUR & TRAVEL</h1>
+          <div class="muted">Reliable taxis · Vrindavan · Mathura · Outstation · Email: jagdishbaghel92541@gmail.com · WhatsApp: +91‑8126312573</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="left">
+        <h2>Book a taxi in seconds</h2>
+        <p class="muted">Fill the form — we'll send you a WhatsApp message to confirm and lock the booking. All fields required.</p>
+        <ul>
+          <li>Vrindavan–Mathura Tour</li>
+          <li>Airport Pickup</li>
+          <li>Outstation Taxi (Agra, Hathras, Delhi, more places)</li>
+          <li>Local Sightseeing</li>
+        </ul>
+      </div>
+
+      <div class="right">
+        <form id="bookingForm">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" placeholder="Your full name" required />
+
+          <div class="row">
+            <div class="col">
+              <label for="pickup">Pickup location</label>
+              <input id="pickup" name="pickup" type="text" placeholder="Eg: Vrindavan, Station Road" required />
+            </div>
+            <div class="col">
+              <label for="drop">Drop location</label>
+              <input id="drop" name="drop" type="text" placeholder="Eg: Mathura, Agra Gate" required />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label for="date">Date</label>
+              <input id="date" name="date" type="date" required />
+            </div>
+            <div class="col">
+              <label for="time">Time</label>
+              <input id="time" name="time" type="time" required />
+            </div>
+          </div>
+
+          <label for="car">Car type</label>
+          <select id="car" name="car" required>
+            <option value="Sedan">Sedan (4 seater)</option>
+            <option value="SUV">SUV (6 seater)</option>
+            <option value="Innova">Innova (7 seater)</option>
+            <option value="Tempo">Tempo Traveller</option>
+          </select>
+
+          <label for="notes">Notes (optional)</label>
+          <textarea id="notes" name="notes" rows="2" placeholder="E.g. Flight number / extra luggage"></textarea>
+
+          <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+            <button type="submit" class="btn">Send WhatsApp & Book</button>
+            <div class="muted">Or call: <strong id="phonePlaceholder">+91‑8126312573</strong></div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section style="margin-top:22px">
+      <h3>How it works</h3>
+      <ol>
+        <li>Fill the booking form and click <em>Send WhatsApp & Book</em>.</li>
+        <li>We open WhatsApp with a pre-filled message. Send it to confirm.</li>
+        <li>Once we receive your message, we'll reply with driver details and fare.</li>
+      </ol>
+    </section>
+
+    <footer>
+      © <span id="year"></span> BANKE LAL TOUR & TRAVEL — All rights reserved
+    </footer>
+  </main>
+
+  <!-- confirmation modal -->
+  <div id="modal" class="modal">
+    <div class="card">
+      <h3>Booking ready</h3>
+      <p id="modalText" class="muted">A WhatsApp message will open with your booking details. Press send in WhatsApp to confirm.</p>
+      <div style="text-align:right;margin-top:12px">
+        <button id="modalClose" class="btn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // -- CONFIG: replace placeholders with your real details --
+    const CONFIG = {
+      businessName: 'BANKE LAL TOUR & TRAVEL',
+      phoneForWhatsApp: '+918126312573', // use country code. e.g. +918126312573
+      displayPhone: '+91‑8126312573',    // what shows on the site; replace when you provide the number
+      defaultPickupCity: 'Vrindavan'
+    };
+
+    document.getElementById('phonePlaceholder').textContent = CONFIG.displayPhone;
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const form = document.getElementById('bookingForm');
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      // build message
+      const msg = `Hello, I want to book a taxi.\nBusiness: ${CONFIG.businessName}\nName: ${data.name}\nPickup: ${data.pickup}\nDrop: ${data.drop}\nDate: ${data.date}\nTime: ${data.time}\nCar: ${data.car}\nNotes: ${data.notes || '-'}\n`;
+
+      // whatsapp URL
+      const phone = CONFIG.phoneForWhatsApp.replace(/[^\d\+]/g,'');
+      const waUrl = `https://wa.me/${phone.replace(/^\+/, '')}?text=` + encodeURIComponent(msg);
+
+      // open whatsapp in new tab (or app on mobile)
+      window.open(waUrl, '_blank');
+
+      // show small confirmation modal
+      document.getElementById('modal').style.display = 'flex';
+      document.getElementById('modalText').textContent = 'We opened WhatsApp with your booking message. Please press send in WhatsApp to confirm. If WhatsApp did not open, copy the message and send to ' + CONFIG.displayPhone + '.';
+    });
+
+    document.getElementById('modalClose').addEventListener('click', ()=>{
+      document.getElementById('modal').style.display = 'none';
+      form.reset();
+    });
+
+    // Helpful: prefill pickup city if user typed nothing yet
+    document.getElementById('pickup').placeholder = CONFIG.defaultPickupCity + ' — e.g. Station Road';
+  </script>
+</body>
+</html>
